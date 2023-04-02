@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 
 public class DemoMain extends ApplicationAdapter {
 
+  private static final int ANGLE_STEP = 5;
+  private static final int BOX_SIZE_STEP = 5;
+  private static final int BOX_START_SIZE = 30;
+
   private ShapeRenderer shapeRenderer;
 
   private int width;
@@ -40,9 +44,6 @@ public class DemoMain extends ApplicationAdapter {
     System.out.println("height = " + Gdx.graphics.getHeight());
     System.out.println("centerX = " + centerX + ", centerY = " + centerY);
 
-    Gdx.gl.glClearColor(0, 0, 0, 1);
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
     addSpiral();
     addSpiral();
     addSpiral();
@@ -61,8 +62,7 @@ public class DemoMain extends ApplicationAdapter {
   }
 
   private void addSpiral() {
-    int boxStartSize = 30;
-    spiralList.add(new Spiral(rnd.nextInt(width), rnd.nextInt(height), 5 + rnd.nextInt(boxStartSize),
+    spiralList.add(new Spiral(rnd.nextInt(width), rnd.nextInt(height), 5 + rnd.nextInt(BOX_START_SIZE),
         rnd.nextInt() % 2 == 0));
   }
 
@@ -102,11 +102,11 @@ public class DemoMain extends ApplicationAdapter {
 
   private void cycleSpiral(Spiral spiral) {
     if (spiral.forwardDirection) {
-      spiral.currentAngle += 5;
+      spiral.currentAngle += ANGLE_STEP;
     } else {
-      spiral.currentAngle -= 5;
+      spiral.currentAngle -= ANGLE_STEP;
     }
-    spiral.currentBoxSize += 5;
+    spiral.currentBoxSize += BOX_SIZE_STEP;
   }
 
   private boolean isSpiralNotFinished(Spiral spiral) {
@@ -120,7 +120,7 @@ public class DemoMain extends ApplicationAdapter {
     float size = boxStartSize;
     Color color = new Color();
 
-    for (int angle = 0; angle < 360; angle += 5, size += 5) {
+    for (int angle = 0; angle < 360; angle += ANGLE_STEP, size += BOX_SIZE_STEP) {
       Color.argb8888ToColor(color, HSBtoRGB(angle / 360f, 1, 1));
       shapeRenderer.setColor(color);
       shapeRenderer.rect(centerX - size, centerY - size, size, size, size * 2, size * 2, 1f, 1f, angle);
