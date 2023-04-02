@@ -62,7 +62,8 @@ public class DemoMain extends ApplicationAdapter {
 
   private void addSpiral() {
     int boxStartSize = 30;
-    spiralList.add(new Spiral(rnd.nextInt(width), rnd.nextInt(height), 5 + rnd.nextInt(boxStartSize)));
+    spiralList.add(new Spiral(rnd.nextInt(width), rnd.nextInt(height), 5 + rnd.nextInt(boxStartSize),
+        rnd.nextInt() % 2 == 0));
   }
 
   private void addSpiralIfNone() {
@@ -100,8 +101,12 @@ public class DemoMain extends ApplicationAdapter {
   }
 
   private void cycleSpiral(Spiral spiral) {
+    if (spiral.forwardDirection) {
       spiral.currentAngle += 5;
-      spiral.currentBoxSize += 5;
+    } else {
+      spiral.currentAngle -= 5;
+    }
+    spiral.currentBoxSize += 5;
   }
 
   private boolean isSpiralNotFinished(Spiral spiral) {
@@ -135,11 +140,14 @@ public class DemoMain extends ApplicationAdapter {
     int currentBoxSize;
     int currentAngle;
 
-    public Spiral(int centerX, int centerY, int initBoxSize) {
+    boolean forwardDirection;
+
+    public Spiral(int centerX, int centerY, int initBoxSize, boolean forwardDirection) {
       this.centerX = centerX;
       this.centerY = centerY;
       this.currentBoxSize = initBoxSize;
       this.currentAngle = 0;
+      this.forwardDirection = forwardDirection;
     }
   }
 }
