@@ -66,7 +66,7 @@ public class DemoMain extends ApplicationAdapter {
   }
 
   private void addSpiralIfNone() {
-    if (spiralList.size() > 0) {
+    if (spiralList.size() == 0) {
       addSpiral();
     }
   }
