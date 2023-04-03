@@ -1,17 +1,77 @@
 package com.graphdemos;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.graphdemos.DemoMain;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
 
-  public static void main(String[] arg) {
+  private static final String RESOLUTION_HORIZONTAL = "h";
+  private static final int WIDTH = 1920;
+  private static final int HEIGHT = 1080;
+
+  private static final Map<String, Class> demos = Map.of(
+      "boxSpirals", DemoMain.class
+  );
+
+  private static String currentResolution = "h";
+  private static String currentDemo = "boxSpirals";
+
+
+  public static void main(String[] arg)
+      throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    parseArgs(arg);
+
     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
     config.setForegroundFPS(60);
     config.setTitle("GraphDemos");
-    config.setWindowedMode(800, 600);
-    new Lwjgl3Application(new DemoMain(), config);
+
+    if (currentResolution.equals(RESOLUTION_HORIZONTAL)) {
+      config.setWindowedMode(WIDTH, HEIGHT);
+    } else {
+      config.setWindowedMode(HEIGHT, WIDTH);
+    }
+
+    new Lwjgl3Application((ApplicationListener) demos.get(currentDemo).getDeclaredConstructors()[0].newInstance(), config);
+  }
+
+  private static void parseArgs(String[] arg) {
+    Options options = new Options();
+
+    Option resolution = new Option("r", "resolution", true, "Resolution (v for vertical, h for horizontal");
+    resolution.setRequired(false);
+    options.addOption(resolution);
+
+    String allDemos = String.join(", ", demos.keySet());
+    Option demoName = new Option("d", "demo", true, "Demo name: " + allDemos);
+    demoName.setRequired(false);
+    options.addOption(demoName);
+
+    CommandLineParser parser = new DefaultParser();
+    HelpFormatter formatter = new HelpFormatter();
+    CommandLine cmd = null;
+
+    try {
+      cmd = parser.parse(options, arg);
+    } catch (ParseException e) {
+      System.out.println(e.getMessage());
+      formatter.printHelp("graph-demos", options);
+
+      System.exit(1);
+    }
+
+    currentResolution = cmd.getOptionValue("resolution", "h");
+    currentDemo = cmd.getOptionValue("demo", "boxSpirals");
   }
 }
