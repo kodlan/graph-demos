@@ -8,34 +8,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
-public class DemoMain extends ApplicationAdapter {
+public class BoxSpiral extends ApplicationAdapter {
 
   private static final int ANGLE_STEP = 5;
   private static final int BOX_SIZE_STEP = 5;
   private static final int BOX_START_SIZE = 30;
+  private static final float MAX_ROTATION_ANGLE = 720f;
 
   private ShapeRenderer shapeRenderer;
 
-  private int width;
-  private int height;
-
-  private final Random rnd = new Random();
-
   private final Color currentColor = new Color();
 
-  List<Spiral> spiralList = new ArrayList<>();
+  private Spiral spiral;
 
   @Override
   public void create() {
     shapeRenderer = new ShapeRenderer();
 
-    width = Gdx.graphics.getWidth();
-    height = Gdx.graphics.getHeight();
+    int width = Gdx.graphics.getWidth();
+    int height = Gdx.graphics.getHeight();
 
     int centerX = width / 2;
     int centerY = height / 2;
@@ -44,12 +36,10 @@ public class DemoMain extends ApplicationAdapter {
     System.out.println("height = " + Gdx.graphics.getHeight());
     System.out.println("centerX = " + centerX + ", centerY = " + centerY);
 
-    addSpiral();
-    addSpiral();
-    addSpiral();
-
     Gdx.gl.glClearColor(0f, 0f, 0f, 1.0f);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+    spiral = new Spiral(centerX, centerY, BOX_START_SIZE);
   }
 
   @Override
@@ -57,31 +47,8 @@ public class DemoMain extends ApplicationAdapter {
     super.render();
 
     shapeRenderer.begin(ShapeType.Line);
-    renderSpirals();
+    nextSpiralFrame(spiral);
     shapeRenderer.end();
-  }
-
-  private void addSpiral() {
-    spiralList.add(new Spiral(rnd.nextInt(width), rnd.nextInt(height), 5 + rnd.nextInt(BOX_START_SIZE),
-        rnd.nextInt() % 2 == 0));
-  }
-
-  private void addSpiralIfNone() {
-    if (spiralList.size() == 0) {
-      addSpiral();
-    }
-  }
-
-  private void renderSpirals() {
-    spiralList.forEach(this::nextSpiralFrame);
-    removeFinishedSpirals();
-    addSpiralIfNone();
-  }
-
-  private void removeFinishedSpirals() {
-    spiralList = spiralList.stream()
-        .filter(this::isSpiralNotFinished)
-        .collect(Collectors.toList());
   }
 
   private void nextSpiralFrame(Spiral spiral) {
@@ -101,16 +68,8 @@ public class DemoMain extends ApplicationAdapter {
   }
 
   private void cycleSpiral(Spiral spiral) {
-    if (spiral.forwardDirection) {
-      spiral.currentAngle += ANGLE_STEP;
-    } else {
-      spiral.currentAngle -= ANGLE_STEP;
-    }
+    spiral.currentAngle += ANGLE_STEP;
     spiral.currentBoxSize += BOX_SIZE_STEP;
-  }
-
-  private boolean isSpiralNotFinished(Spiral spiral) {
-    return spiral.currentBoxSize < 360;
   }
 
   /**
@@ -120,8 +79,8 @@ public class DemoMain extends ApplicationAdapter {
     float size = boxStartSize;
     Color color = new Color();
 
-    for (int angle = 0; angle < 360; angle += ANGLE_STEP, size += BOX_SIZE_STEP) {
-      Color.argb8888ToColor(color, HSBtoRGB(angle / 360f, 1, 1));
+    for (int angle = 0; angle < MAX_ROTATION_ANGLE; angle += ANGLE_STEP, size += BOX_SIZE_STEP) {
+      Color.argb8888ToColor(color, HSBtoRGB(angle / MAX_ROTATION_ANGLE, 1, 1));
       shapeRenderer.setColor(color);
       shapeRenderer.rect(centerX - size, centerY - size, size, size, size * 2, size * 2, 1f, 1f, angle);
     }
@@ -140,14 +99,11 @@ public class DemoMain extends ApplicationAdapter {
     int currentBoxSize;
     int currentAngle;
 
-    boolean forwardDirection;
-
-    public Spiral(int centerX, int centerY, int initBoxSize, boolean forwardDirection) {
+    public Spiral(int centerX, int centerY, int initBoxSize) {
       this.centerX = centerX;
       this.centerY = centerY;
       this.currentBoxSize = initBoxSize;
       this.currentAngle = 0;
-      this.forwardDirection = forwardDirection;
     }
   }
 }

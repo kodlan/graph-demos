@@ -22,11 +22,12 @@ public class DesktopLauncher {
   private static final int HEIGHT = 1080;
 
   private static final Map<String, Class> demos = Map.of(
-      "boxSpirals", DemoMain.class
+      "BoxSpirals", BoxSpirals.class,
+      "BoxSpiral", BoxSpiral.class
   );
 
   private static String currentResolution = "h";
-  private static String currentDemo = "boxSpirals";
+  private static String currentDemo = "BoxSpiral";
 
 
   public static void main(String[] arg)
@@ -72,6 +73,6 @@ public class DesktopLauncher {
     }
 
     currentResolution = cmd.getOptionValue("resolution", "h");
-    currentDemo = cmd.getOptionValue("demo", "boxSpirals");
+    currentDemo = cmd.getOptionValue("demo", "BoxSpiral");
   }
 }
