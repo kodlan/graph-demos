@@ -22,7 +22,7 @@ java -XstartOnFirstThread -jar desktop-1.0.jar -d BoxSpiral
 
 ### Demos:
 
-| Image                                                                 | Comments                            |
-|-----------------------------------------------------------------------|-------------------------------------|
-| ![](/Users/kodlan/workspaces/libgdx/graph-demos/images/boxspiral.png) | Demo name: `BoxSpiral`<br/>Source: [BoxSpiral.java](https://github.com/kodlan/graph-demos/blob/readme/core/src/com/graphdemos/BoxSpiral.java) |
+| Image                       | Comments                            |
+|-----------------------------|-------------------------------------|
+| ![](./images/boxspiral.png) | Demo name: `BoxSpiral`<br/>Source: [BoxSpiral.java](https://github.com/kodlan/graph-demos/blob/readme/core/src/com/graphdemos/BoxSpiral.java) |
 
