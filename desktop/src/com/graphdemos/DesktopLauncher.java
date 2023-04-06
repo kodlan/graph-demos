@@ -37,6 +37,7 @@ public class DesktopLauncher {
     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
     config.setForegroundFPS(60);
     config.setTitle("GraphDemos");
+    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 2);
 
     if (currentResolution.equals(RESOLUTION_HORIZONTAL)) {
       config.setWindowedMode(WIDTH, HEIGHT);
