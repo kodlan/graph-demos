@@ -6,13 +6,24 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import java.util.Map;
 
 public class HilbertCurve extends ApplicationAdapter {
 
   private ShapeRenderer shapeRenderer;
 
-  private int centerX;
-  private int centerY;
+  private float currentAngle = 0;
+  private float currentX;
+  private float currentY;
+
+  private Map<Integer, Color> colorPerLevelMap = Map.of(
+      1, Color.GREEN,
+      2, Color.RED,
+      3, Color.BLUE,
+      4, Color.BROWN,
+      5, Color.CORAL,
+      6, Color.GOLD
+  );
 
   @Override
   public void create() {
@@ -21,8 +32,10 @@ public class HilbertCurve extends ApplicationAdapter {
     int width = Gdx.graphics.getWidth();
     int height = Gdx.graphics.getHeight();
 
-    centerX = width / 2;
-    centerY = height / 2;
+    int centerX = width / 2;
+    int centerY = height / 2;
+    currentX = 40;
+    currentY = 40;
 
     System.out.println("width = " + Gdx.graphics.getWidth());
     System.out.println("height = " + Gdx.graphics.getHeight());
@@ -40,14 +53,10 @@ public class HilbertCurve extends ApplicationAdapter {
 
     shapeRenderer.setColor(Color.RED);
 
-    hilbert(6, 90, 20);
+    hilbert(6, 90, 10);
 
     shapeRenderer.end();
   }
-
-  private float currentAngle = 0;
-  private float currentX = centerX;
-  private float currentY = centerY;
 
   private void turn(float angle) {
     this.currentAngle += angle;
@@ -67,6 +76,8 @@ public class HilbertCurve extends ApplicationAdapter {
     if (level == 0) {
       return;
     }
+
+    shapeRenderer.setColor(colorPerLevelMap.get(level));
 
     turn(angle);
     hilbert(level - 1, -angle, length);
