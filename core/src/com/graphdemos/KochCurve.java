@@ -16,6 +16,8 @@ public class KochCurve extends ApplicationAdapter {
 
   private ShapeRenderer shapeRenderer;
 
+  private int centerX, centerY;
+
   @Override
   public void create() {
     shapeRenderer = new ShapeRenderer();
@@ -23,8 +25,8 @@ public class KochCurve extends ApplicationAdapter {
     int width = Gdx.graphics.getWidth();
     int height = Gdx.graphics.getHeight();
 
-    int centerX = width / 2;
-    int centerY = height / 2;
+    centerX = width / 2;
+    centerY = height / 2;
 
     System.out.println("width = " + Gdx.graphics.getWidth());
     System.out.println("height = " + Gdx.graphics.getHeight());
@@ -33,7 +35,7 @@ public class KochCurve extends ApplicationAdapter {
     Gdx.gl.glClearColor(0f, 0f, 0f, 1.0f);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-     new KochCurveTurtleGraph(centerX / 2, centerY);
+    new KochCurveTurtleGraph();
   }
 
   @Override
@@ -45,7 +47,7 @@ public class KochCurve extends ApplicationAdapter {
 
     while(!linesToDraw.isEmpty()) {
       TurtleLine line = linesToDraw.poll();
-      shapeRenderer.rectLine(line.x0, line.y0, line.x1, line.y1, 2);
+      shapeRenderer.rectLine(line.x0, line.y0, line.x1, line.y1, 1);
     }
 
     shapeRenderer.end();
@@ -59,8 +61,8 @@ public class KochCurve extends ApplicationAdapter {
 
   private class KochCurveTurtleGraph extends TurtleGraph {
 
-    public KochCurveTurtleGraph(int currentX, int currentY) {
-      super(currentX, currentY);
+    public KochCurveTurtleGraph() {
+      super(centerX / 2, centerY, 5);
     }
 
     private void koch(int level, int length) {

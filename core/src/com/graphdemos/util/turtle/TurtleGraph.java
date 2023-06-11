@@ -10,13 +10,25 @@ public abstract class TurtleGraph {
   private float currentY;
   private int currentAngle = 90;
 
+  private int currentDelay = DELAY;
+
   private final List<TurtleLine> linesToDraw = new ArrayList<>();
 
   public TurtleGraph(int currentX, int currentY) {
-
     this.currentX = currentX;
     this.currentY = currentY;
 
+    init();
+  }
+
+  public TurtleGraph(float currentX, float currentY, int currentDelay) {
+    this.currentX = currentX;
+    this.currentY = currentY;
+    this.currentDelay = currentDelay;
+    init();
+  }
+
+  private void init() {
     Thread turtleThread = new Thread() {
       @Override
       public void run() {
@@ -67,7 +79,7 @@ public abstract class TurtleGraph {
 
   private void threadSleep() {
     try {
-      Thread.sleep(DELAY);
+      Thread.sleep(currentDelay);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -75,6 +87,7 @@ public abstract class TurtleGraph {
 
   private void turtleNotifyAndSleep() {
     turtleNotify();
+    linesToDraw.clear();
     threadSleep();
   }
 }

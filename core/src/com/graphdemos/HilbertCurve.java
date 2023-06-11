@@ -6,36 +6,27 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import java.util.Map;
+import com.graphdemos.util.turtle.TurtleGraph;
+import com.graphdemos.util.turtle.TurtleLine;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class HilbertCurve extends ApplicationAdapter {
 
+  private final ArrayBlockingQueue<TurtleLine> linesToDraw = new ArrayBlockingQueue<>(10000);
+
   private ShapeRenderer shapeRenderer;
 
-  private float currentAngle = 0;
-  private float currentX;
-  private float currentY;
-
-  private Map<Integer, Color> colorPerLevelMap = Map.of(
-      1, Color.GREEN,
-      2, Color.RED,
-      3, Color.BLUE,
-      4, Color.BROWN,
-      5, Color.CORAL,
-      6, Color.GOLD
-  );
+  private int height;
 
   @Override
   public void create() {
     shapeRenderer = new ShapeRenderer();
 
     int width = Gdx.graphics.getWidth();
-    int height = Gdx.graphics.getHeight();
+    height = Gdx.graphics.getHeight();
 
     int centerX = width / 2;
     int centerY = height / 2;
-    currentX = 40;
-    currentY = 40;
 
     System.out.println("width = " + Gdx.graphics.getWidth());
     System.out.println("height = " + Gdx.graphics.getHeight());
@@ -43,6 +34,8 @@ public class HilbertCurve extends ApplicationAdapter {
 
     Gdx.gl.glClearColor(0f, 0f, 0f, 1.0f);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+    new HilbertCurveTurtleGraph();
   }
 
   @Override
@@ -50,55 +43,57 @@ public class HilbertCurve extends ApplicationAdapter {
     super.render();
 
     shapeRenderer.begin(ShapeType.Filled);
-
     shapeRenderer.setColor(Color.RED);
 
-    hilbert(6, 90, 10);
+    while(!linesToDraw.isEmpty()) {
+      TurtleLine line = linesToDraw.poll();
+      shapeRenderer.rectLine(line.x0, line.y0, line.x1, line.y1, 1);
+    }
 
     shapeRenderer.end();
   }
-
-  private void turn(float angle) {
-    this.currentAngle += angle;
-  }
-
-  private void forward(float length) {
-    float newX = currentX + length * (float) Math.sin(Math.toRadians(currentAngle));
-    float newY = currentY + length * (float) Math.cos(Math.toRadians(currentAngle));
-
-    shapeRenderer.rectLine(currentX, currentY, newX, newY, 2);
-
-    currentX = newX;
-    currentY = newY;
-  }
-
-  private void hilbert(int level, float angle, float length) {
-    if (level == 0) {
-      return;
-    }
-
-    shapeRenderer.setColor(colorPerLevelMap.get(level));
-
-    turn(angle);
-    hilbert(level - 1, -angle, length);
-
-    forward(length);
-    turn(-angle);
-    hilbert(level - 1, angle, length);
-
-    forward(length);
-    hilbert(level - 1, angle, length);
-
-    turn(-angle);
-    forward(length);
-    hilbert(level - 1, -angle, length);
-
-    turn(angle);
-  }
-
   @Override
   public void dispose() {
     super.dispose();
     shapeRenderer.dispose();
+  }
+
+  private class HilbertCurveTurtleGraph extends TurtleGraph {
+
+    public HilbertCurveTurtleGraph() {
+      super(10, height - 10, 10);
+    }
+
+    private void hilbert(int level, int angle, int length) {
+      if (level == 0) {
+        return;
+      }
+
+      right(angle);
+      hilbert(level - 1, -angle, length);
+
+      forward(length);
+      right(-angle);
+      hilbert(level - 1, angle, length);
+
+      forward(length);
+      hilbert(level - 1, angle, length);
+
+      right(-angle);
+      forward(length);
+      hilbert(level - 1, -angle, length);
+
+      right(angle);
+    }
+
+    @Override
+    public void turtleDraw() {
+      hilbert(6, 90, 10);
+    }
+
+    @Override
+    public void turtleNotify() {
+      linesToDraw.addAll(this.getLinesToDraw());
+    }
   }
 }
