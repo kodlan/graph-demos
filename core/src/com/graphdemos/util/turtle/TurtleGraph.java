@@ -14,16 +14,17 @@ public abstract class TurtleGraph {
 
   private final List<TurtleLine> linesToDraw = new ArrayList<>();
 
-  public TurtleGraph(int currentX, int currentY) {
+  private final TurtleGraphRenderer renderer;
+
+  public TurtleGraph(int currentX, int currentY, TurtleGraphRenderer renderer) {
     this.currentX = currentX;
     this.currentY = currentY;
-
+    this.renderer = renderer;
     init();
   }
 
-  public TurtleGraph(float currentX, float currentY, int currentDelay) {
-    this.currentX = currentX;
-    this.currentY = currentY;
+  public TurtleGraph(int currentX, int currentY, int currentDelay, TurtleGraphRenderer renderer) {
+    this(currentX, currentY, renderer);
     this.currentDelay = currentDelay;
     init();
   }
@@ -41,8 +42,6 @@ public abstract class TurtleGraph {
   }
 
   public abstract void turtleDraw();
-
-  public abstract void turtleNotify();
 
   /**
    * draw line forward
@@ -86,8 +85,10 @@ public abstract class TurtleGraph {
   }
 
   private void turtleNotifyAndSleep() {
-    turtleNotify();
-    linesToDraw.clear();
-    threadSleep();
+    if (this.linesToDraw.size() != 0) {
+      TurtleGraph.this.renderer.addLinesToRender(this.linesToDraw);
+      linesToDraw.clear();
+      threadSleep();
+    }
   }
 }

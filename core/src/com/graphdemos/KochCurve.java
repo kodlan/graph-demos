@@ -1,5 +1,7 @@
 package com.graphdemos;
 
+import static com.graphdemos.util.ColorUtil.HSBtoRGB;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -7,16 +9,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.graphdemos.util.turtle.TurtleGraph;
-import com.graphdemos.util.turtle.TurtleLine;
-import java.util.concurrent.ArrayBlockingQueue;
+import com.graphdemos.util.turtle.TurtleGraphRenderer;
 
 public class KochCurve extends ApplicationAdapter {
 
-  private final ArrayBlockingQueue<TurtleLine> linesToDraw = new ArrayBlockingQueue<>(10000);
+  private final TurtleGraphRenderer turtleGraphRenderer = new TurtleGraphRenderer();
 
   private ShapeRenderer shapeRenderer;
 
   private int centerX, centerY;
+
+  private final Color currentColor = new Color();
+  private float colorCounter = 0;
 
   @Override
   public void create() {
@@ -43,12 +47,15 @@ public class KochCurve extends ApplicationAdapter {
     super.render();
 
     shapeRenderer.begin(ShapeType.Filled);
-    shapeRenderer.setColor(Color.RED);
 
-    while(!linesToDraw.isEmpty()) {
-      TurtleLine line = linesToDraw.poll();
+    turtleGraphRenderer.renderLines(line -> {
+      Color.argb8888ToColor(currentColor, HSBtoRGB(colorCounter, 1, 1));
+      shapeRenderer.setColor(currentColor);
+
       shapeRenderer.rectLine(line.x0, line.y0, line.x1, line.y1, 1);
-    }
+
+      colorCounter += 0.001;
+    });
 
     shapeRenderer.end();
   }
@@ -62,7 +69,7 @@ public class KochCurve extends ApplicationAdapter {
   private class KochCurveTurtleGraph extends TurtleGraph {
 
     public KochCurveTurtleGraph() {
-      super(centerX / 2, centerY, 5);
+      super(centerX / 2, centerY, 5, turtleGraphRenderer);
     }
 
     private void koch(int level, int length) {
@@ -88,12 +95,7 @@ public class KochCurve extends ApplicationAdapter {
 
     @Override
     public void turtleDraw() {
-      koch(5, 600);
-    }
-
-    @Override
-    public void turtleNotify() {
-      linesToDraw.addAll(this.getLinesToDraw());
+      koch(5, 700);
     }
   }
 }

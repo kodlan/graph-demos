@@ -1,5 +1,7 @@
 package com.graphdemos;
 
+import static com.graphdemos.util.ColorUtil.HSBtoRGB;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -7,16 +9,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.graphdemos.util.turtle.TurtleGraph;
-import com.graphdemos.util.turtle.TurtleLine;
-import java.util.concurrent.ArrayBlockingQueue;
+import com.graphdemos.util.turtle.TurtleGraphRenderer;
 
 public class HilbertCurve extends ApplicationAdapter {
 
-  private final ArrayBlockingQueue<TurtleLine> linesToDraw = new ArrayBlockingQueue<>(10000);
-
   private ShapeRenderer shapeRenderer;
 
+  private final TurtleGraphRenderer turtleGraphRenderer = new TurtleGraphRenderer();
+
   private int height;
+
+  private final Color currentColor = new Color();
+  private float colorCounter = 0;
 
   @Override
   public void create() {
@@ -45,10 +49,14 @@ public class HilbertCurve extends ApplicationAdapter {
     shapeRenderer.begin(ShapeType.Filled);
     shapeRenderer.setColor(Color.RED);
 
-    while(!linesToDraw.isEmpty()) {
-      TurtleLine line = linesToDraw.poll();
+    turtleGraphRenderer.renderLines(line -> {
+      Color.argb8888ToColor(currentColor, HSBtoRGB(colorCounter, 1, 1));
+      shapeRenderer.setColor(currentColor);
+
       shapeRenderer.rectLine(line.x0, line.y0, line.x1, line.y1, 1);
-    }
+
+      colorCounter += 0.001;
+    });
 
     shapeRenderer.end();
   }
@@ -61,7 +69,7 @@ public class HilbertCurve extends ApplicationAdapter {
   private class HilbertCurveTurtleGraph extends TurtleGraph {
 
     public HilbertCurveTurtleGraph() {
-      super(10, height - 10, 10);
+      super(10, height - 10, 10, turtleGraphRenderer);
     }
 
     private void hilbert(int level, int angle, int length) {
@@ -89,11 +97,6 @@ public class HilbertCurve extends ApplicationAdapter {
     @Override
     public void turtleDraw() {
       hilbert(6, 90, 10);
-    }
-
-    @Override
-    public void turtleNotify() {
-      linesToDraw.addAll(this.getLinesToDraw());
     }
   }
 }
