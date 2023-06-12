@@ -18,16 +18,22 @@ import org.apache.commons.cli.ParseException;
 public class DesktopLauncher {
 
   private static final String RESOLUTION_HORIZONTAL = "h";
+
+  private static final String DEFAULT_DEMO = "Koch";
+
   private static final int WIDTH = 1920;
   private static final int HEIGHT = 1080;
 
   private static final Map<String, Class> demos = Map.of(
       "BoxSpirals", BoxSpirals.class,
-      "BoxSpiral", BoxSpiral.class
+      "BoxSpiral", BoxSpiral.class,
+      "Hilbert", HilbertCurve.class,
+      "Koch", KochCurve.class
   );
 
+
   private static String currentResolution = "h";
-  private static String currentDemo = "BoxSpiral";
+  private static String currentDemo = DEFAULT_DEMO;
 
 
   public static void main(String[] arg)
@@ -74,6 +80,6 @@ public class DesktopLauncher {
     }
 
     currentResolution = cmd.getOptionValue("resolution", "h");
-    currentDemo = cmd.getOptionValue("demo", "BoxSpiral");
+    currentDemo = cmd.getOptionValue("demo", DEFAULT_DEMO);
   }
 }
